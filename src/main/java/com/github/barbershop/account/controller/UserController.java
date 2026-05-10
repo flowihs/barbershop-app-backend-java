@@ -1,0 +1,136 @@
+package com.github.barbershop.account.controller;
+
+import com.github.barbershop.account.dto.TelegramAuthRequest;
+import com.github.barbershop.account.dto.UserDTO;
+import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.dto.TelegramUserData;
+import com.github.barbershop.account.service.TelegramAuthValidator;
+import com.github.barbershop.account.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api")
+@RequiredArgsConstructor
+@Tag(name = "Аутентификация", description = "API для авторизации через Telegram Mini App")
+public class UserController {
+
+    private final TelegramAuthValidator telegramAuthValidator;
+    private final UserService userService;
+
+    @Operation(
+            summary = "Авторизация через Telegram",
+            description = """
+                    Авторизует пользователя через данные от Telegram Mini App.
+                    
+                    initData должна быть получена из window.Telegram.WebApp.initData
+                    на фронтенде Mini App и передана на бэкенд без изменений.
+                    """
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Успешная авторизация",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = UserDTO.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Невалидные данные"
+            ),
+            @ApiResponse(
+                    responseCode = "500",
+                    description = "Внутренняя ошибка сервера"
+            )
+
+    })
+    @PostMapping("/auth")
+    public ResponseEntity<UserDTO> authenticate(
+            @Parameter(
+                    description = "Данные авторизации от Telegram Mini App",
+                    required = true,
+                    examples = @ExampleObject(
+                            value = """
+                                    {
+                                        "initData": "query_id=AAHdF6IQAAAAAN0XohDhrOrc&user=%7B%22id%22%3A279058397%2C%22first_name%22%3A%22Иван%22%7D&auth_date=1654325678&hash=abc123...",
+                                        "authType": "mini_app",
+                                        "languageCode": "ru"
+                                    }
+                                    """
+                    )
+            )
+            @RequestBody TelegramAuthRequest request) {
+
+        if (!telegramAuthValidator.validate(request.getInitData())) {
+            throw new RuntimeException("Невалидная сигнатура Telegram");
+        }
+
+        TelegramUserData telegramUser = telegramAuthValidator
+                .extractUserData(request.getInitData());
+
+        User user = userService.findOrCreateUser(telegramUser);
+
+        return ResponseEntity.ok(UserDTO.fromUser(user));
+    }
+
+    @Operation(
+            summary = "Получить профиль пользователя",
+            description = "Возвращает данные пользователя по его ID в системе",
+            tags = {"Пользователи"}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Профиль найден",
+                    content = @Content(schema = @Schema(implementation = UserDTO.class))
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Пользователь не найден"
+            )
+    })
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserDTO> getUserProfile(
+            @Parameter(description = "ID пользователя", example = "1")
+            @PathVariable Long userId) {
+
+        User user = userService.findById(userId);
+        return ResponseEntity.ok(UserDTO.fromUser(user));
+    }
+
+    @Operation(
+            summary = "Получить профиль по Telegram ID",
+            description = "Возвращает данные пользователя по его Telegram ID",
+            tags = {"Пользователи"}
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Профиль найден"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Пользователь не найден"
+            )
+    })
+    @GetMapping("/users/telegram/{telegramId}")
+    public ResponseEntity<UserDTO> getUserByTelegramId(
+            @Parameter(description = "Telegram ID пользователя", example = "123456789")
+            @PathVariable Long telegramId) {
+
+        User user = userService.findByTelegramId(telegramId);
+        return ResponseEntity.ok(UserDTO.fromUser(user));
+    }
+}

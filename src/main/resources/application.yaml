@@ -1,0 +1,39 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/barbershop
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  aop:
+    auto: true
+    proxy-target-class: true
+
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:your_token_here}
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.github.barbershop: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.springframework.web: INFO
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+  api-docs:
+    path: /api-docs
