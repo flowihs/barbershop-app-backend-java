@@ -10,29 +10,26 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "provisions")
+@Table(
+        name = "provision_likes",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"provision_id", "user_id"})
+        }
+)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Provision {
+public class ProvisionLike {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provision_id", nullable = false)
+    private Provision provision;
 
-    @Column
-    private String description;
-
-    @Column
-    private float rating;
-
-    @ManyToOne
-    private ProvisionCategory provisionCategory;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
@@ -41,6 +38,7 @@ public class Provision {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 
     @PrePersist
     protected void onCreate() {

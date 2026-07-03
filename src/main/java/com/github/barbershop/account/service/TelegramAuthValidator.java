@@ -92,7 +92,7 @@ public class TelegramAuthValidator {
         String userJson = params.get("user");
 
         if (userJson == null) {
-            throw new IllegalArgumentException("User data not found in initData");
+            throw new IllegalArgumentException("Данных пользователя нет в initData");
         }
 
         return parseUserJson(userJson);
@@ -102,7 +102,7 @@ public class TelegramAuthValidator {
         try {
             return objectMapper.readValue(userJson, TelegramUserData.class);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Failed to parse user data: " + userJson, e);
+            throw new IllegalArgumentException("Ошибка при парсинге данных пользователя");
         }
     }
 }

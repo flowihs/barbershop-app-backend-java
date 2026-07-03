@@ -30,12 +30,9 @@ public class UserController {
 
     @Operation(
             summary = "Авторизация через Telegram",
-            description = """
-                    Авторизует пользователя через данные от Telegram Mini App.
-                    
-                    initData должна быть получена из window.Telegram.WebApp.initData
-                    на фронтенде Mini App и передана на бэкенд без изменений.
-                    """
+            description = "Авторизует пользователя через данные от Telegram Mini App.\n" +
+                    "initData должна быть получена из window.Telegram.WebApp.initData " +
+                    "на фронтенде Mini App и передана на бэкенд без изменений."
     )
     @ApiResponses(value = {
             @ApiResponse(
@@ -62,13 +59,7 @@ public class UserController {
                     description = "Данные авторизации от Telegram Mini App",
                     required = true,
                     examples = @ExampleObject(
-                            value = """
-                                    {
-                                        "initData": "query_id=AAHdF6IQAAAAAN0XohDhrOrc&user=%7B%22id%22%3A279058397%2C%22first_name%22%3A%22Иван%22%7D&auth_date=1654325678&hash=abc123...",
-                                        "authType": "mini_app",
-                                        "languageCode": "ru"
-                                    }
-                                    """
+                            value = "{\"initData\":\"query_id=AAHdF6IQAAAAAN0XohDhrOrc&user=%7B%22id%22%3A279058397%2C%22first_name%22%3A%22Иван%22%7D&auth_date=1654325678&hash=abc123...\",\"authType\":\"mini_app\",\"languageCode\":\"ru\"}"
                     )
             )
             @RequestBody TelegramAuthRequest request) {
@@ -105,7 +96,6 @@ public class UserController {
     public ResponseEntity<UserDTO> getUserProfile(
             @Parameter(description = "ID пользователя", example = "1")
             @PathVariable Long userId) {
-
         User user = userService.findById(userId);
         return ResponseEntity.ok(UserDTO.fromUser(user));
     }

@@ -1,8 +1,10 @@
 package com.github.barbershop.account.entity;
 
+import com.github.barbershop.provision.entity.Provision;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -29,6 +31,9 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Provision> provisions;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

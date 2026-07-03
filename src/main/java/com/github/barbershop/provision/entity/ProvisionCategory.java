@@ -1,6 +1,5 @@
 package com.github.barbershop.provision.entity;
 
-import com.github.barbershop.account.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,39 +7,35 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "provisions")
+@Table(name = "provision_categories")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Provision {
-    @Id
+public class ProvisionCategory {
+
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
     private Long id;
 
     @Column
-    private String title;
+    private String name;
 
     @Column
     private String description;
 
-    @Column
-    private float rating;
-
-    @ManyToOne
-    private ProvisionCategory provisionCategory;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @OneToMany(mappedBy = "provisionCategory")
+    private List<Provision> provisions;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
 
     @PrePersist
     protected void onCreate() {

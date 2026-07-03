@@ -1,5 +1,6 @@
 package com.github.barbershop.account.service;
 
+import com.github.barbershop.account.exception.UserNotFoundException;
 import com.github.barbershop.account.dto.TelegramUserData;
 import com.github.barbershop.account.entity.User;
 import com.github.barbershop.account.entity.UserRole;
@@ -34,11 +35,11 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(UserNotFoundException::new);
     }
 
     public User findByTelegramId(Long telegramId) {
         return userRepository.findByTelegramId(telegramId)
-                .orElseThrow(() -> new RuntimeException("User not found with telegramId: " + telegramId));
+                .orElseThrow(UserNotFoundException::new);
     }
 }
