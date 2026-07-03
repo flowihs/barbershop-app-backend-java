@@ -1,7 +1,7 @@
 spring:
   datasource:
-    url: jdbc:postgresql://db.liycscaykudjdfrccnig.supabase.co:5432/postgres?sslmode=require
-    username: postgres
+    url: jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+    username: postgres.liycscaykudjdfrccnig
     password: AkV2ajAuTwHGO8GS
     driver-class-name: org.postgresql.Driver
     hikari:
