@@ -6,6 +6,7 @@ import com.github.barbershop.provision.dto.*;
 import com.github.barbershop.provision.service.ProvisionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -35,14 +36,14 @@ public class ProvisionController {
 
     @Operation(summary = "Создать новую услугу (доступно ADMIN и BARBER)")
     @PostMapping("/create")
-    public ResponseEntity<ProvisionResponse> create(@RequestBody CreateProvisionRequest dto) {
+    public ResponseEntity<ProvisionResponse> create(@RequestBody @Valid CreateProvisionRequest dto) {
         User currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionService.create(dto, currentUser.getId()));
     }
 
     @Operation(summary = "Обновить услугу (только владелец)")
     @PutMapping("/update")
-    public ResponseEntity<ProvisionResponse> update(@RequestBody UpdateProvisionRequest dto) {
+    public ResponseEntity<ProvisionResponse> update(@RequestBody @Valid UpdateProvisionRequest dto) {
         User currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionService.update(dto, currentUser.getId()));
     }
@@ -65,7 +66,7 @@ public class ProvisionController {
 
     @Operation(summary = "Добавить слот к услуге (только владелец)")
     @PostMapping("/add-slot")
-    public ResponseEntity<Void> addSlot(@RequestBody CreateProvisionSlotRequest dto) {
+    public ResponseEntity<Void> addSlot(@RequestBody @Valid CreateProvisionSlotRequest dto) {
         User currentUser = authUtils.getCurrentUser();
         provisionService.addSlotToProvision(dto, currentUser.getId());
         return ResponseEntity.ok().build();
@@ -73,7 +74,7 @@ public class ProvisionController {
 
     @Operation(summary = "Удалить слот у услуги (только владелец)")
     @PostMapping("/remove-slot")
-    public ResponseEntity<Void> removeSlot(@RequestBody RemoveProvisionSlotRequest dto) {
+    public ResponseEntity<Void> removeSlot(@RequestBody @Valid RemoveProvisionSlotRequest dto) {
         User currentUser = authUtils.getCurrentUser();
         provisionService.removeSlotInProvision(dto, currentUser.getId());
         return ResponseEntity.ok().build();

@@ -11,13 +11,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -53,7 +51,7 @@ public class ProvisionCategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ProvisionCategoryResponse> create(CreateProvisionCategoryRequest dto) {
+    public ResponseEntity<ProvisionCategoryResponse> create(@RequestBody @Valid CreateProvisionCategoryRequest dto) {
         User currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionCategoryService.create(dto, currentUser.getRole()));
     }
