@@ -40,7 +40,7 @@ public class ProvisionService {
                 .collect(Collectors.toList());
     }
 
-    public ProvisionResponse getById(Long id, Long userId) {
+    public ProvisionResponse getById(final Long id, final Long userId) {
         Provision provision = provisionRepository.findById(id)
                 .orElseThrow(ProvisionNotFoundException::new);
 
@@ -52,7 +52,7 @@ public class ProvisionService {
     }
 
     @Transactional
-    public ProvisionResponse create(CreateProvisionRequest dto, Long userId) {
+    public ProvisionResponse create(final CreateProvisionRequest dto, final Long userId) {
         User user = userService.findById(userId);
         validateUserRole(user);
 
@@ -99,7 +99,7 @@ public class ProvisionService {
     }
 
     @Transactional
-    public ProvisionResponse update(UpdateProvisionRequest dto, Long userId) {
+    public ProvisionResponse update(final UpdateProvisionRequest dto, final Long userId) {
         Provision existingProvision = provisionRepository.findById(dto.getId())
                 .orElseThrow(ProvisionNotFoundException::new);
 
@@ -125,7 +125,7 @@ public class ProvisionService {
     }
 
     @Transactional
-    public void delete(Long provisionId, Long userId) {
+    public void delete(final Long provisionId, final Long userId) {
         Provision provision = provisionRepository.findById(provisionId)
                 .orElseThrow(ProvisionNotFoundException::new);
 
@@ -137,7 +137,7 @@ public class ProvisionService {
     }
 
     @Transactional
-    public void removeSlotInProvision(RemoveProvisionSlotRequest dto, Long userId) {
+    public void removeSlotInProvision(final RemoveProvisionSlotRequest dto, final Long userId) {
         ProvisionSlot slot = provisionSlotRepository.findById(dto.getSlotId())
                 .orElseThrow(ProvisionSlotNotFoundException::new);
 
@@ -151,7 +151,7 @@ public class ProvisionService {
     }
 
     @Transactional
-    public void addSlotToProvision(CreateProvisionSlotRequest dto, Long userId) {
+    public void addSlotToProvision(final CreateProvisionSlotRequest dto, final Long userId) {
         if (dto.getStartTime().isAfter(dto.getEndTime()) ||
                 dto.getStartTime().equals(dto.getEndTime())) {
             throw new IncorrectTimeProvisionSlotException();
@@ -181,7 +181,7 @@ public class ProvisionService {
         provisionSlotRepository.save(slot);
     }
 
-    private void validateUserRole(User user) {
+    private void validateUserRole(final User user) {
         String role = user.getRole().toString();
         if (!"ADMIN".equals(role) && !"BARBER".equals(role)) {
             throw new InsufficientPermissionsToCreateProvisionException();

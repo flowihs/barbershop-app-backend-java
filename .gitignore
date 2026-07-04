@@ -35,4 +35,3 @@ build/
 
 src/main/resources/application.yaml
 docker-compose.yaml
-Dockerfile

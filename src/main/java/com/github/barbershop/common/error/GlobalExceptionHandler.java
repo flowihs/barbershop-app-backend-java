@@ -1,4 +1,4 @@
-package com.github.barbershop.exception;
+package com.github.barbershop.common.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
