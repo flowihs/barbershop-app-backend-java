@@ -1,9 +1,18 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/barbershop
-    username: admin
-    password: admin
+    url: jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+    username: postgres.liycscaykudjdfrccnig
+    password: AkV2ajAuTwHGO8GS
     driver-class-name: org.postgresql.Driver
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1
+      validation-timeout: 5000
+      leak-detection-threshold: 60000
 
   jpa:
     hibernate:
@@ -11,7 +20,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        connection:
+          provider_disables_autocommit: true
+        temp:
+          use_jdbc_metadata_defaults: false
     show-sql: true
+    open-in-view: false
 
   aop:
     auto: true
@@ -22,18 +40,29 @@ telegram:
     token: ${TELEGRAM_BOT_TOKEN:your_token_here}
 
 server:
-  port: 8080
+  port: ${PORT:8080}
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: always
 
 logging:
   level:
     com.github.barbershop: DEBUG
     org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql: TRACE
     org.springframework.web: INFO
+    com.zaxxer.hikari: DEBUG
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
     operationsSorter: method
     tagsSorter: alpha
+    try-it-out-enabled: true
+    filter: true
   api-docs:
     path: /api-docs
+    enabled: true
+  show-actuator: true
+  packages-to-scan: com.github.barbershop
