@@ -1,44 +1,42 @@
 package com.github.barbershop.provision.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.barbershop.account.entity.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "provisions")
+@Table(
+        name = "provision_slots",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"provision_id", "start_time"})
+        }
+)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Provision {
+public class ProvisionSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provision_id", nullable = false)
+    private Provision provision;
 
-    @Column
-    private String description;
+    @Column(name = "start_time", nullable = false)
+    private LocalDateTime startTime;
 
-    @Column
-    private float rating;
+    @Column(name = "end_time", nullable = false)
+    private LocalDateTime endTime;
 
-    @ManyToOne
-    private ProvisionCategory provisionCategory;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
-
-    @OneToMany(mappedBy = "provision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @ToString.Exclude
-    @JsonIgnore
-    private List<ProvisionSlot> slots;
+    @Column(name = "is_available", nullable = false)
+    private boolean available = true;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
