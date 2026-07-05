@@ -37,7 +37,7 @@ spring:
 
 telegram:
   bot:
-    token: ${TELEGRAM_BOT_TOKEN:your_token_here}
+    token: "8689939913:AAEdHp3p2tLexQ5XrfTN9A3TeP45O4Zqyqg"
 
 server:
   port: ${PORT:8080}

@@ -1,5 +1,6 @@
 package com.github.barbershop.account.controller;
 
+import com.github.barbershop.account.dto.TelegramAuthRequest;
 import com.github.barbershop.account.dto.UserDTO;
 import com.github.barbershop.account.entity.User;
 import com.github.barbershop.account.dto.TelegramUserData;
@@ -54,41 +55,15 @@ public class UserController {
 
     })
     @PostMapping("/auth")
-    public ResponseEntity<UserDTO> authenticate(
-            @RequestBody(required = false) String rawBody) {
-
-        System.out.println("📥 Raw body: " + rawBody);
-
-        String initData = null;
-
-        if (rawBody == null || rawBody.isEmpty()) {
-            throw new RuntimeException("Тело запроса пустое");
+    public ResponseEntity<UserDTO> authenticate(@RequestBody(required = false) TelegramAuthRequest request) {
+        if (request == null || request.getInitData() == null || request.getInitData().isBlank()) {
+            throw new IllegalArgumentException("initData не найден или пустой");
         }
 
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode node = mapper.readTree(rawBody);
-
-            if (node.has("initData")) {
-                initData = node.get("initData").asText();
-            } else if (node.isTextual()) {
-                initData = node.asText();
-            }
-        } catch (Exception e) {
-            initData = rawBody;
-        }
-
-        if (initData != null && initData.startsWith("\"") && initData.endsWith("\"")) {
-            initData = initData.substring(1, initData.length() - 1);
-            initData = initData.replace("\\\"", "\"");
-        }
-
-        if (initData == null || initData.isEmpty()) {
-            throw new RuntimeException("initData не найден или пустой");
-        }
+        String initData = request.getInitData();
 
         if (!telegramAuthValidator.validate(initData)) {
-            throw new RuntimeException("Невалидная сигнатура Telegram");
+            throw new IllegalArgumentException("Невалидная сигнатура Telegram");
         }
 
         TelegramUserData telegramUser = telegramAuthValidator.extractUserData(initData);
