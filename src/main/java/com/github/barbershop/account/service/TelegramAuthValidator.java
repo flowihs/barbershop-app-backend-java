@@ -28,35 +28,40 @@ public class TelegramAuthValidator {
     public boolean validate(String initData) {
         try {
             Map<String, String> params = parseQueryString(initData);
-            // Telegram WebApp uses 'hash' field
+
+            // Удаляем нестандартное поле signature
+            params.remove("signature");
+
             String receivedHash = params.remove("hash");
             if (receivedHash == null) {
-                receivedHash = params.remove("signature"); // на всякий случай
-            }
-            if (receivedHash == null) {
-                log.warn("No hash/signature present in initData");
+                log.warn("No hash present in initData");
                 return false;
             }
 
-            // Build data_check_string: sort keys and join "key=value" with URL-decoded values
+            // Строим data_check_string: сортируем ключи и соединяем через \n
+            // ВАЖНО: значения НЕ декодируем, используем как пришли
             List<String> keys = new ArrayList<>(params.keySet());
             Collections.sort(keys);
             String dataCheckString = keys.stream()
-                    .map(k -> k + "=" + urlDecode(params.get(k)))
+                    .map(k -> k + "=" + params.get(k))
                     .collect(Collectors.joining("\n"));
 
             log.debug("data_check_string: {}", dataCheckString);
 
-            // secret = SHA256(botToken)
+            // Вычисляем секретный ключ: SHA256(bot_token)
             byte[] secret = sha256(botToken.getBytes(StandardCharsets.UTF_8));
 
-            // compute HMAC-SHA256(secret, data_check_string)
+            // Вычисляем HMAC-SHA256
             byte[] hmac = hmacSha256(secret, dataCheckString.getBytes(StandardCharsets.UTF_8));
             String computedHex = bytesToHexLower(hmac);
 
-            log.debug("computed hash: {}, received hash: {}", computedHex, receivedHash.toLowerCase());
+            boolean isValid = computedHex.equals(receivedHash.toLowerCase());
 
-            return computedHex.equals(receivedHash.toLowerCase());
+            if (!isValid) {
+                log.warn("Hash mismatch. Computed: {}, Received: {}", computedHex, receivedHash.toLowerCase());
+            }
+
+            return isValid;
         } catch (Exception e) {
             log.error("Error validating initData", e);
             return false;
@@ -79,7 +84,7 @@ public class TelegramAuthValidator {
     }
 
     private static Map<String, String> parseQueryString(String qs) {
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> map = new LinkedHashMap<>(); // Важно: сохраняем порядок для логов
         if (qs == null || qs.isEmpty()) return map;
         String[] parts = qs.split("&");
         for (String p : parts) {
