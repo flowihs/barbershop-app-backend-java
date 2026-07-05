@@ -1,6 +1,5 @@
 package com.github.barbershop.account.controller;
 
-import com.github.barbershop.account.dto.TelegramAuthRequest;
 import com.github.barbershop.account.dto.UserDTO;
 import com.github.barbershop.account.entity.User;
 import com.github.barbershop.account.dto.TelegramUserData;
@@ -9,7 +8,6 @@ import com.github.barbershop.account.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -18,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api")
@@ -55,22 +55,43 @@ public class UserController {
     })
     @PostMapping("/auth")
     public ResponseEntity<UserDTO> authenticate(
-            @Parameter(
-                    description = "Данные авторизации от Telegram Mini App",
-                    required = true,
-                    examples = @ExampleObject(
-                            value = "{\"initData\":\"query_id=AAHdF6IQAAAAAN0XohDhrOrc&user=%7B%22id%22%3A279058397%2C%22first_name%22%3A%22Иван%22%7D&auth_date=1654325678&hash=abc123...\",\"authType\":\"mini_app\",\"languageCode\":\"ru\"}"
-                    )
-            )
-            @RequestBody TelegramAuthRequest request) {
+            @RequestBody(required = false) String rawBody) {
 
-        if (!telegramAuthValidator.validate(request.getInitData())) {
+        System.out.println("📥 Raw body: " + rawBody);
+
+        String initData = null;
+
+        if (rawBody == null || rawBody.isEmpty()) {
+            throw new RuntimeException("Тело запроса пустое");
+        }
+
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode node = mapper.readTree(rawBody);
+
+            if (node.has("initData")) {
+                initData = node.get("initData").asText();
+            } else if (node.isTextual()) {
+                initData = node.asText();
+            }
+        } catch (Exception e) {
+            initData = rawBody;
+        }
+
+        if (initData != null && initData.startsWith("\"") && initData.endsWith("\"")) {
+            initData = initData.substring(1, initData.length() - 1);
+            initData = initData.replace("\\\"", "\"");
+        }
+
+        if (initData == null || initData.isEmpty()) {
+            throw new RuntimeException("initData не найден или пустой");
+        }
+
+        if (!telegramAuthValidator.validate(initData)) {
             throw new RuntimeException("Невалидная сигнатура Telegram");
         }
 
-        TelegramUserData telegramUser = telegramAuthValidator
-                .extractUserData(request.getInitData());
-
+        TelegramUserData telegramUser = telegramAuthValidator.extractUserData(initData);
         User user = userService.findOrCreateUser(telegramUser);
 
         return ResponseEntity.ok(UserDTO.fromUser(user));
