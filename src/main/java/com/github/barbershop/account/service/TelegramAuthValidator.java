@@ -11,7 +11,6 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,11 +24,12 @@ public class TelegramAuthValidator {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private static final long MAX_AUTH_AGE_SECONDS = 86400;
+
     public boolean validate(String initData) {
         try {
             Map<String, String> params = parseQueryString(initData);
 
-            // Удаляем нестандартное поле signature
             params.remove("signature");
 
             String receivedHash = params.remove("hash");
@@ -38,8 +38,11 @@ public class TelegramAuthValidator {
                 return false;
             }
 
-            // Строим data_check_string: сортируем ключи и соединяем через \n
-            // ВАЖНО: значения НЕ декодируем, используем как пришли
+            if (!isAuthDateValid(params.get("auth_date"))) {
+                log.warn("initData auth_date is missing or expired");
+                return false;
+            }
+
             List<String> keys = new ArrayList<>(params.keySet());
             Collections.sort(keys);
             String dataCheckString = keys.stream()
@@ -48,11 +51,11 @@ public class TelegramAuthValidator {
 
             log.debug("data_check_string: {}", dataCheckString);
 
-            // Вычисляем секретный ключ: SHA256(bot_token)
-            byte[] secret = sha256(botToken.getBytes(StandardCharsets.UTF_8));
-
-            // Вычисляем HMAC-SHA256
-            byte[] hmac = hmacSha256(secret, dataCheckString.getBytes(StandardCharsets.UTF_8));
+            byte[] secretKey = hmacSha256(
+                    "WebAppData".getBytes(StandardCharsets.UTF_8),
+                    botToken.getBytes(StandardCharsets.UTF_8)
+            );
+            byte[] hmac = hmacSha256(secretKey, dataCheckString.getBytes(StandardCharsets.UTF_8));
             String computedHex = bytesToHexLower(hmac);
 
             boolean isValid = computedHex.equals(receivedHash.toLowerCase());
@@ -68,15 +71,27 @@ public class TelegramAuthValidator {
         }
     }
 
+    private boolean isAuthDateValid(String authDate) {
+        if (authDate == null || authDate.isBlank()) {
+            return false;
+        }
+        try {
+            long authTimestamp = Long.parseLong(authDate);
+            long now = System.currentTimeMillis() / 1000;
+            return authTimestamp <= now && now - authTimestamp <= MAX_AUTH_AGE_SECONDS;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
     public TelegramUserData extractUserData(String initData) {
         Map<String, String> params = parseQueryString(initData);
         String userEncoded = params.get("user");
         if (userEncoded == null) {
             throw new IllegalArgumentException("Данных пользователя нет в initData");
         }
-        String userJson = urlDecode(userEncoded);
         try {
-            return objectMapper.readValue(userJson, TelegramUserData.class);
+            return objectMapper.readValue(userEncoded, TelegramUserData.class);
         } catch (Exception e) {
             log.error("Failed to parse user JSON", e);
             throw new IllegalArgumentException("Ошибка при парсинге данных пользователя");
@@ -84,34 +99,36 @@ public class TelegramAuthValidator {
     }
 
     private static Map<String, String> parseQueryString(String qs) {
-        Map<String, String> map = new LinkedHashMap<>(); // Важно: сохраняем порядок для логов
-        if (qs == null || qs.isEmpty()) return map;
+        Map<String, String> map = new LinkedHashMap<>();
+        if (qs == null || qs.isEmpty()) {
+            return map;
+        }
+        if (qs.startsWith("?")) {
+            qs = qs.substring(1);
+        }
         String[] parts = qs.split("&");
         for (String p : parts) {
             int idx = p.indexOf('=');
             if (idx >= 0) {
-                String k = p.substring(0, idx);
-                String v = p.substring(idx + 1);
+                String k = urlDecode(p.substring(0, idx));
+                String v = urlDecode(p.substring(idx + 1));
                 map.put(k, v);
             } else {
-                map.put(p, "");
+                map.put(urlDecode(p), "");
             }
         }
         return map;
     }
 
     private static String urlDecode(String s) {
-        if (s == null) return null;
+        if (s == null) {
+            return null;
+        }
         try {
-            return URLDecoder.decode(s, StandardCharsets.UTF_8.name());
+            return URLDecoder.decode(s, StandardCharsets.UTF_8);
         } catch (Exception e) {
             return s;
         }
-    }
-
-    private static byte[] sha256(byte[] data) throws Exception {
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        return md.digest(data);
     }
 
     private static byte[] hmacSha256(byte[] key, byte[] data) throws Exception {
