@@ -1,8 +1,15 @@
 spring:
+  profiles:
+    active: dev
+
+  docker:
+    compose:
+      enabled: false
+
   datasource:
-    url: jdbc:postgresql://aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
-    username: postgres.liycscaykudjdfrccnig
-    password: AkV2ajAuTwHGO8GS
+    url: jdbc:postgresql://aws-0-eu-west-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+    username: postgres.qzcaycblufsrtzudlrol
+    password: fsfdsfds3421342dsadsa11__
     driver-class-name: org.postgresql.Driver
     hikari:
       connection-timeout: 30000
@@ -35,10 +42,6 @@ spring:
     auto: true
     proxy-target-class: true
 
-telegram:
-  bot:
-    token: "8689939913:AAEdHp3p2tLexQ5XrfTN9A3TeP45O4Zqyqg"
-
 server:
   port: ${PORT:8080}
   error:
@@ -66,3 +69,16 @@ springdoc:
     enabled: true
   show-actuator: true
   packages-to-scan: com.github.barbershop
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+telegram:
+  bot:
+    token: "8696905823:AAHtTk1Kz8VbrgK5wIjsojpSkIzBvS19rE0"
