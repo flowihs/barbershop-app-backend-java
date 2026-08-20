@@ -11,7 +11,4 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TelegramAuthRequest {
     private String initData;
-    private String authType;
-    private String referralCode;
-    private String languageCode;
 }

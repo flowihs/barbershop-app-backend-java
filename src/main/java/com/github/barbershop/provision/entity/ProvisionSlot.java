@@ -1,6 +1,5 @@
 package com.github.barbershop.provision.entity;
 
-import com.github.barbershop.account.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

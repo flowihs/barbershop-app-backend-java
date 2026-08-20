@@ -20,7 +20,7 @@ public class CorsConfig {
 
         config.setExposedHeaders(List.of("Authorization", "X-Telegram-Id"));
 
-        config.setAllowCredentials(false);
+        config.setAllowCredentials(true);
         config.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

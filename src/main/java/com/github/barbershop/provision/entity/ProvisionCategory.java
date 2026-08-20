@@ -27,8 +27,8 @@ public class ProvisionCategory {
     @Column
     private String description;
 
-    @OneToMany(mappedBy = "provisionCategory")
-    private List<Provision> provisions;
+//    @OneToMany(mappedBy = "provisionCategory")
+//    private List<Provision> provisions;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
