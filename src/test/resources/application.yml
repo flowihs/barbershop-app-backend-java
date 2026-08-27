@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:barbershop;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        show_sql: false
+
+telegram:
+  bot:
+    token: test-bot-token-for-context-startup
+
+jwt:
+  secret: test-jwt-secret-that-is-at-least-thirty-two-bytes-long
+  access-expiration: 3600000
