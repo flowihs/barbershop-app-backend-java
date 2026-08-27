@@ -1,28 +1,38 @@
-//package com.github.barbershop.account.security;
-//
-//import com.github.barbershop.account.entity.User;
-//import com.github.barbershop.account.service.UserService;
-//import jakarta.servlet.http.HttpServletRequest;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.stereotype.Component;
-//import org.springframework.web.context.request.RequestContextHolder;
-//import org.springframework.web.context.request.ServletRequestAttributes;
-//
-//@Component
-//@RequiredArgsConstructor
-//public class AuthUtils {
-//
-//    private final UserService userService;
-//
-//    public User getCurrentUser() {
-//        HttpServletRequest request = ((ServletRequestAttributes)
-//                RequestContextHolder.currentRequestAttributes()).getRequest();
-//
-//        String telegramIdHeader = request.getHeader("X-Telegram-Id");
-//        if (telegramIdHeader == null) {
-//            throw new RuntimeException("Пользователь не авторизован");
-//        }
-//
-//        return userService.findByTelegramId(Long.parseLong(telegramIdHeader));
-//    }
-//}
+package com.github.barbershop.account.security;
+
+import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+@RequiredArgsConstructor
+public class AuthUtils {
+
+    private final UserService userService;
+
+    public User getCurrentUser() {
+        return getCurrentUserOptional()
+                .orElseThrow(() -> new RuntimeException("Пользователь не авторизован"));
+    }
+
+    public Optional<User> getCurrentUserOptional() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return Optional.empty();
+        }
+
+        try {
+            Long telegramId = Long.parseLong(authentication.getName());
+            return Optional.of(userService.findByTelegramId(telegramId));
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Неверный формат идентификатора пользователя");
+        }
+    }
+}

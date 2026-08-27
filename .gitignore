@@ -32,6 +32,10 @@ build/
 ### VS Code ###
 .vscode/
 
+# Local secrets
+.env
+*.pem
+
 
 src/main/resources/application.yaml
 docker-compose.yaml

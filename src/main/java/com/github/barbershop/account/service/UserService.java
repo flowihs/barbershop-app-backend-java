@@ -1,6 +1,6 @@
 package com.github.barbershop.account.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.github.barbershop.account.dto.TelegramUserData;
 import com.github.barbershop.account.dto.UserDTO;
 import com.github.barbershop.account.entity.User;
 import com.github.barbershop.account.entity.UserRole;
@@ -21,17 +21,17 @@ public class UserService {
     private final ConcurrentHashMap<Long, Object> locks = new ConcurrentHashMap<>();
 
     @Transactional
-    public UserDTO verifyTelegram(JsonNode node) {
-        Long id = node.get("id").asLong();
+    public UserDTO verifyTelegram(TelegramUserData telegramUser) {
+        Long telegramId = telegramUser.getId();
 
-        Object lock = locks.computeIfAbsent(id, k -> new Object());
+        Object lock = locks.computeIfAbsent(telegramId, ignored -> new Object());
         synchronized (lock) {
             try {
-                User user = userRepository.findById(id)
-                        .orElseGet(() -> register(node));
+                User user = userRepository.findByTelegramId(telegramId)
+                        .orElseGet(() -> register(telegramUser));
                 return UserDTO.fromUser(user);
             } finally {
-                locks.remove(id);
+                locks.remove(telegramId, lock);
             }
         }
     }
@@ -41,19 +41,18 @@ public class UserService {
                 .orElseThrow(UserNotFoundException::new);
     }
 
-    private User register(JsonNode node) {
-        Long id = node.get("id").asLong();
-        String firstName = node.get("first_name").asText();
-        String lastName = node.get("last_name").asText();
-        String username = node.get("username").asText();
-        String photoUrl = node.get("photo_url").asText();
+    public User findByTelegramId(Long telegramId) {
+        return userRepository.findByTelegramId(telegramId)
+                .orElseThrow(UserNotFoundException::new);
+    }
 
+    private User register(TelegramUserData telegramUser) {
         User user = User.builder()
-                .id(id)
-                .firstName(firstName)
-                .lastName(lastName)
-                .username(username)
-                .photoUrl(photoUrl)
+                .telegramId(telegramUser.getId())
+                .firstName(telegramUser.getFirstName())
+                .lastName(telegramUser.getLastName())
+                .username(telegramUser.getUsername())
+                .photoUrl(telegramUser.getPhotoUrl())
                 .role(UserRole.CLIENT)
                 .build();
 

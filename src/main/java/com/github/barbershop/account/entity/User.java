@@ -2,6 +2,8 @@ package com.github.barbershop.account.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
 
 @Entity
@@ -12,7 +14,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class User {
     @Id
-    private Long id; // Это Telegram ID
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "telegram_id", nullable = false, unique = true)
+    private Long telegramId;
 
     private String firstName;
     private String lastName;
@@ -23,6 +29,7 @@ public class User {
     private String photoUrl;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private UserRole role;
 
     private LocalDateTime createdAt;

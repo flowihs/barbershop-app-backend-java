@@ -1,5 +1,6 @@
 package com.github.barbershop.account.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,5 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TelegramAuthRequest {
+    @NotBlank
     private String initData;
 }

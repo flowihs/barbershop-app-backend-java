@@ -97,3 +97,7 @@ supabase:
   publishable-key: sb_publishable_X424Bvr-rPr13ZTqCNiChQ_CqyVZqoJ
   secret-key: sb_secret_mA_-FxRyBH70-uLVtrnbqQ_XXHospOp
   jwks-url: https://qzcaycblufsrtzudlrol.supabase.co/auth/v1/.well-known/jwks.json
+
+jwt:
+  secret: fdsfdsfdsfdsfdsfdsfdsfdsfdsfsdfdsfdsfsdfsdfsdfds
+  access-expiration: 86400000

@@ -48,6 +48,26 @@ class TelegramAuthValidatorTest {
     }
 
     @Test
+    void validateRejectsExpiredInitData() throws Exception {
+        String initData = buildInitData(
+                "{\"id\":123,\"first_name\":\"Test\"}",
+                String.valueOf(Instant.now().minusSeconds(86401).getEpochSecond())
+        );
+
+        assertFalse(validator.validate(initData));
+    }
+
+    @Test
+    void validateRejectsDuplicateParameters() throws Exception {
+        String initData = buildInitData(
+                "{\"id\":123,\"first_name\":\"Test\"}",
+                String.valueOf(Instant.now().getEpochSecond())
+        );
+
+        assertFalse(validator.validate(initData + "&auth_date=1"));
+    }
+
+    @Test
     void extractUserDataParsesUserJson() throws Exception {
         String initData = buildInitData(
                 "{\"id\":123,\"first_name\":\"Test\",\"username\":\"testuser\"}",
@@ -59,6 +79,14 @@ class TelegramAuthValidatorTest {
         assertEquals(123L, user.getId());
         assertEquals("Test", user.getFirstName());
         assertEquals("testuser", user.getUsername());
+    }
+
+    @Test
+    void validateAndExtractRejectsUnsignedData() {
+        String unsigned = "user=%7B%22id%22%3A123%2C%22first_name%22%3A%22Test%22%7D"
+                + "&auth_date=" + Instant.now().getEpochSecond();
+
+        assertThrows(IllegalArgumentException.class, () -> validator.validateAndExtract(unsigned));
     }
 
     private String buildInitData(String userJson, String authDate) throws Exception {

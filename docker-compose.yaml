@@ -16,7 +16,7 @@ services:
       retries: 5
 
   app:
-    build: ../../Desktop/Новая папка
+    build: .
     ports:
       - "8080:8080"
     depends_on:
@@ -28,6 +28,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: admin
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_PROFILES_ACTIVE: docker
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ACCESS_EXPIRATION: ${JWT_ACCESS_EXPIRATION:-86400000}
 
 #  redis:
 #    image: redis:7-alpine

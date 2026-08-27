@@ -35,6 +35,7 @@ public class ProvisionSlot {
     private LocalDateTime endTime;
 
     @Column(name = "is_available", nullable = false)
+    @Builder.Default
     private boolean available = true;
 
     @Column(name = "created_at", nullable = false)

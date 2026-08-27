@@ -1,6 +1,7 @@
 package com.github.barbershop.provision.service;
 
 import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.entity.UserRole;
 import com.github.barbershop.account.service.UserService;
 import com.github.barbershop.provision.dto.*;
 import com.github.barbershop.provision.entity.Provision;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,7 +48,8 @@ public class ProvisionService {
 
         ProvisionResponse response = ProvisionResponse.fromEntity(provision);
         response.setLikesCount(provisionLikeRepository.countByProvisionId(id));
-        response.setLikedByMe(provisionLikeRepository.existsByProvisionIdAndUserId(id, userId));
+        response.setLikedByMe(userId != null
+                && provisionLikeRepository.existsByProvisionIdAndUserId(id, userId));
 
         return response;
     }
@@ -81,30 +84,31 @@ public class ProvisionService {
 
     @Transactional
     public void toggleLike(final Long provisionId, final Long userId) {
-        Provision provision = provisionRepository.findById(provisionId)
-                .orElseThrow(ProvisionNotFoundException::new);
-        User user = userService.findById(userId);
+        Optional<ProvisionLike> existingLike = provisionLikeRepository
+                .findByProvisionIdAndUserId(provisionId, userId);
 
-        provisionLikeRepository.findByProvisionIdAndUserId(provisionId, userId)
-                .ifPresentOrElse(
-                        provisionLikeRepository::delete,
-                        () -> {
-                            ProvisionLike like = ProvisionLike.builder()
-                                    .provision(provision)
-                                    .user(user)
-                                    .build();
-                            provisionLikeRepository.save(like);
-                        }
-                );
+        if (existingLike.isPresent()) {
+            provisionLikeRepository.delete(existingLike.get());
+            provisionLikeRepository.flush();
+        } else {
+            Provision provision = provisionRepository.findById(provisionId)
+                    .orElseThrow(ProvisionNotFoundException::new);
+            User user = userService.findById(userId);
+
+            ProvisionLike like = ProvisionLike.builder()
+                    .provision(provision)
+                    .user(user)
+                    .build();
+            provisionLikeRepository.save(like);
+        }
     }
-
     @Transactional
     public ProvisionResponse update(final UpdateProvisionRequest dto, final Long userId) {
         Provision existingProvision = provisionRepository.findById(dto.getId())
                 .orElseThrow(ProvisionNotFoundException::new);
 
-        if (!existingProvision.getUser().getId().equals(userId)) {
-            throw new InsufficientPermissionsToCreateProvisionException();
+        if (!canManage(existingProvision, userId)) {
+            throw new InsufficientPermissionsToUpdateProvisionException();
         }
 
         if (dto.getTitle() != null) {
@@ -129,7 +133,7 @@ public class ProvisionService {
         Provision provision = provisionRepository.findById(provisionId)
                 .orElseThrow(ProvisionNotFoundException::new);
 
-        if (!provision.getUser().getId().equals(userId)) {
+        if (!canManage(provision, userId)) {
             throw new InsufficientPermissionsToDeleteProvisionException();
         }
 
@@ -143,7 +147,7 @@ public class ProvisionService {
 
         Long provisionUserId = provisionRepository.findUserIdById(slot.getProvision().getId());
 
-        if (!Objects.equals(provisionUserId, userId)) {
+        if (!Objects.equals(provisionUserId, userId) && !isAdmin(userId)) {
             throw new InsufficientPermissionsToUpdateProvisionException();
         }
 
@@ -160,7 +164,7 @@ public class ProvisionService {
         Provision provision = provisionRepository.findById(dto.getProvisionId())
                 .orElseThrow(ProvisionNotFoundException::new);
 
-        if (!Objects.equals(provision.getUser().getId(), userId)) {
+        if (!canManage(provision, userId)) {
             throw new InsufficientPermissionsToUpdateProvisionException();
         }
 
@@ -182,9 +186,16 @@ public class ProvisionService {
     }
 
     private void validateUserRole(final User user) {
-        String role = user.getRole().toString();
-        if (!"ADMIN".equals(role) && !"BARBER".equals(role)) {
+        if (user.getRole() != UserRole.ADMIN && user.getRole() != UserRole.BARBER) {
             throw new InsufficientPermissionsToCreateProvisionException();
         }
+    }
+
+    private boolean canManage(Provision provision, Long userId) {
+        return Objects.equals(provision.getUser().getId(), userId) || isAdmin(userId);
+    }
+
+    private boolean isAdmin(Long userId) {
+        return userService.findById(userId).getRole() == UserRole.ADMIN;
     }
 }
