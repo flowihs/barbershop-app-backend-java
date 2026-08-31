@@ -1,8 +1,8 @@
 package com.github.barbershop.provision.service;
 
-import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.entity.UserRole;
-import com.github.barbershop.account.service.UserService;
+import com.github.barbershop.account.service.AccountService;
 import com.github.barbershop.provision.dto.*;
 import com.github.barbershop.provision.entity.Provision;
 import com.github.barbershop.provision.entity.ProvisionCategory;
@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 public class ProvisionService {
     private final ProvisionRepository provisionRepository;
     private final ProvisionCategoryService provisionCategoryService;
-    private final UserService userService;
+    private final AccountService userService;
     private final ProvisionLikeRepository provisionLikeRepository;
-    private final ProvisionSlotRepository provisionSlotRepository; // используется в create()
+    private final ProvisionSlotRepository provisionSlotRepository;
 
     public List<ProvisionResponse> getAll() {
         List<Provision> provisions = provisionRepository.findAll();
@@ -54,9 +54,16 @@ public class ProvisionService {
         return response;
     }
 
+    public List<ProvisionResponse> getTop5ByUserIdOrderByRatingDesc(final Long id) {
+        return provisionRepository.findTop5ByUserIdOrderByRatingDesc(id).stream()
+                .map(ProvisionResponse::fromEntity)
+                .toList();
+    }
+
+
     @Transactional
     public ProvisionResponse create(final CreateProvisionRequest dto, final Long userId) {
-        User user = userService.findById(userId);
+        Account user = userService.findById(userId);
         validateUserRole(user);
 
         ProvisionCategory provisionCategory = provisionCategoryService.getEntityById(dto.getCategoryId());
@@ -93,7 +100,7 @@ public class ProvisionService {
         } else {
             Provision provision = provisionRepository.findById(provisionId)
                     .orElseThrow(ProvisionNotFoundException::new);
-            User user = userService.findById(userId);
+            Account user = userService.findById(userId);
 
             ProvisionLike like = ProvisionLike.builder()
                     .provision(provision)
@@ -185,7 +192,7 @@ public class ProvisionService {
         provisionSlotRepository.save(slot);
     }
 
-    private void validateUserRole(final User user) {
+    private void validateUserRole(final Account user) {
         if (user.getRole() != UserRole.ADMIN && user.getRole() != UserRole.BARBER) {
             throw new InsufficientPermissionsToCreateProvisionException();
         }

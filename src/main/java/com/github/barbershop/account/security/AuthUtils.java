@@ -1,7 +1,7 @@
 package com.github.barbershop.account.security;
 
-import com.github.barbershop.account.entity.User;
-import com.github.barbershop.account.service.UserService;
+import com.github.barbershop.account.entity.Account;
+import com.github.barbershop.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,14 +13,14 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthUtils {
 
-    private final UserService userService;
+    private final AccountService userService;
 
-    public User getCurrentUser() {
+    public Account getCurrentUser() {
         return getCurrentUserOptional()
                 .orElseThrow(() -> new RuntimeException("Пользователь не авторизован"));
     }
 
-    public Optional<User> getCurrentUserOptional() {
+    public Optional<Account> getCurrentUserOptional() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication == null || !authentication.isAuthenticated()

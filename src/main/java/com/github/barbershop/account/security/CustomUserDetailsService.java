@@ -1,7 +1,6 @@
 package com.github.barbershop.account.security;
 
-import com.github.barbershop.account.entity.User;
-import com.github.barbershop.account.repository.UserRepository;
+import com.github.barbershop.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,7 +13,7 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final AccountRepository userRepository;
 
     @Override
     public UserDetails loadUserByUsername(String telegramId) throws UsernameNotFoundException {
@@ -25,7 +24,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("Invalid Telegram user id", exception);
         }
 
-        User user = userRepository.findByTelegramId(parsedTelegramId)
+        com.github.barbershop.account.entity.Account user = userRepository.findByTelegramId(parsedTelegramId)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "User not found with Telegram id: " + telegramId));
 

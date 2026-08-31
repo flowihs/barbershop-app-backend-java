@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,7 +26,18 @@ public class User {
     @Column(unique = true)
     private String username;
 
+    private String description;
+
     private String photoUrl;
+
+    @Column(unique = true)
+    private String instagram;
+
+    @Column(unique = true)
+    private String tiktok;
+
+    @Column(unique = true)
+    private String number;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)

@@ -6,7 +6,7 @@ import com.github.barbershop.account.dto.TelegramUserData;
 import com.github.barbershop.account.dto.UserDTO;
 import com.github.barbershop.account.security.JwtTokenProvider;
 import com.github.barbershop.account.service.TelegramAuthValidator;
-import com.github.barbershop.account.service.UserService;
+import com.github.barbershop.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class TelegramAuthController {
-    private final UserService userService;
+    private final AccountService userService;
     private final TelegramAuthValidator telegramAuthValidator;
     private final JwtTokenProvider jwtTokenProvider;
 

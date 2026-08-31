@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProvisionRepository extends JpaRepository<Provision, Long> {
@@ -12,4 +13,6 @@ public interface ProvisionRepository extends JpaRepository<Provision, Long> {
 
     @Query("SELECT p.user.id FROM Provision p WHERE p.id = :provisionId")
     Long findUserIdById(@Param("provisionId") Long provisionId);
+
+    List<Provision> findTop5ByUserIdOrderByRatingDesc(Long userId);
 }

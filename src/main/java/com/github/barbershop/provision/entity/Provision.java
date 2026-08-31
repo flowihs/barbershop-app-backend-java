@@ -1,7 +1,7 @@
 package com.github.barbershop.provision.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.entity.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,12 +28,15 @@ public class Provision {
     @Column
     private float rating;
 
+    @Column
+    private String avatar;
+
     @ManyToOne
     private ProvisionCategory provisionCategory;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Account user;
 
     @OneToMany(mappedBy = "provision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

@@ -97,7 +97,18 @@ supabase:
   publishable-key: sb_publishable_X424Bvr-rPr13ZTqCNiChQ_CqyVZqoJ
   secret-key: sb_secret_mA_-FxRyBH70-uLVtrnbqQ_XXHospOp
   jwks-url: https://qzcaycblufsrtzudlrol.supabase.co/auth/v1/.well-known/jwks.json
+  s3:
+    endpoint: "https://avuufbkordlkdykqlnri.storage.supabase.co" # S3 endpoint (без /storage/v1/...)
+    region: "eu-west-1"
+    access-key: "83c84c9992c416d866f75fc3604d6478"
+    secret-key: "6d463067231a12b3d4db5ba20bb1f3964c859bf7abb24a27c357c00637f253e0"
+    bucket: "your-bucket-name"
+    # publicUrlBase — шаблон для публичного доступа к объектам (настрой под ваш проект)
+    # Например: https://<project-ref>.supabase.co/storage/v1/object/public
+    public-url-base: "https://avuufbkordlkdykqlnri.supabase.co/storage/v1/object/public"
 
 jwt:
   secret: fdsfdsfdsfdsfdsfdsfdsfdsfdsfsdfdsfdsfsdfsdfsdfds
   access-expiration: 86400000
+
+

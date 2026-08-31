@@ -8,6 +8,8 @@ import com.github.barbershop.provision.exception.InsufficientPermissionsToCreate
 import com.github.barbershop.provision.exception.ProvisionCategoryNotFoundException;
 import com.github.barbershop.provision.exception.ProvisionNotFoundException;
 import com.github.barbershop.provision.repository.ProvisionCategoryRepository;
+import com.github.barbershop.storage.dto.UploadResult;
+import com.github.barbershop.storage.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProvisionCategoryService {
     private final ProvisionCategoryRepository provisionCategoryRepository;
+    private final StorageService storageService;
 
     public List<ProvisionCategoryResponse> getAll() {
         List<ProvisionCategory> categories = provisionCategoryRepository.findAll();
@@ -44,9 +47,12 @@ public class ProvisionCategoryService {
             throw new InsufficientPermissionsToCreateProvisionCategoryException();
         }
 
+        UploadResult upload = storageService.uploadImage(dto.getImage());
+
         ProvisionCategory provisionCategory = ProvisionCategory.builder()
                 .name(dto.getName())
                 .description(dto.getDescription())
+                .image(upload.publicUrl())
                 .build();
 
         ProvisionCategory createProvisionCategory = provisionCategoryRepository.save(provisionCategory);

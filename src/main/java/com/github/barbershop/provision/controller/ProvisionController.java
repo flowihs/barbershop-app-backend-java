@@ -1,6 +1,6 @@
 package com.github.barbershop.provision.controller;
 
-import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.entity.UserRole;
 import com.github.barbershop.account.security.AuthUtils;
 import com.github.barbershop.provision.dto.*;
@@ -27,9 +27,15 @@ public class ProvisionController {
     @GetMapping("/{id}")
     public ResponseEntity<ProvisionResponse> getById(@PathVariable Long id) {
         Long currentUserId = authUtils.getCurrentUserOptional()
-                .map(User::getId)
+                .map(Account::getId)
                 .orElse(null);
         return ResponseEntity.ok(provisionService.getById(id, currentUserId));
+    }
+
+    @Operation(summary = "Получить топ 5 услуг пользователя по рейтингу")
+    @GetMapping("/top-five/{id}")
+    public ResponseEntity<List<ProvisionResponse>> getTop5ByUserIdOrderByRatingDesc (@PathVariable Long userId) {
+        return ResponseEntity.ok(provisionService.getTop5ByUserIdOrderByRatingDesc(userId));
     }
 
     @Operation(summary = "Получить все услуги (доступно всем)")
@@ -41,7 +47,7 @@ public class ProvisionController {
     @Operation(summary = "Создать новую услугу (доступно ADMIN и BARBER)")
     @PostMapping("/create")
     public ResponseEntity<ProvisionResponse> create(@RequestBody @Valid CreateProvisionRequest dto) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
 
         if (currentUser.getRole() != UserRole.ADMIN && currentUser.getRole() != UserRole.BARBER) {
             throw new InsufficientPermissionsToCreateProvisionException();
@@ -53,14 +59,14 @@ public class ProvisionController {
     @Operation(summary = "Обновить услугу (только владелец или ADMIN)")
     @PutMapping("/update")
     public ResponseEntity<ProvisionResponse> update(@RequestBody @Valid UpdateProvisionRequest dto) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionService.update(dto, currentUser.getId()));
     }
 
     @Operation(summary = "Удалить услугу (только владелец или ADMIN)")
     @DeleteMapping("/delete")
     public ResponseEntity<Void> delete(@RequestParam Long provisionId) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
         provisionService.delete(provisionId, currentUser.getId());
         return ResponseEntity.ok().build();
     }
@@ -68,7 +74,7 @@ public class ProvisionController {
     @Operation(summary = "Поставить/убрать лайк (доступно всем авторизованным)")
     @PostMapping("/{id}/like")
     public ResponseEntity<Void> toggleLike(@PathVariable Long id) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
         provisionService.toggleLike(id, currentUser.getId());
         return ResponseEntity.ok().build();
     }
@@ -76,7 +82,7 @@ public class ProvisionController {
     @Operation(summary = "Добавить слот к услуге (только владелец или ADMIN)")
     @PostMapping("/add-slot")
     public ResponseEntity<Void> addSlot(@RequestBody @Valid CreateProvisionSlotRequest dto) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
         provisionService.addSlotToProvision(dto, currentUser.getId());
         return ResponseEntity.ok().build();
     }
@@ -84,7 +90,7 @@ public class ProvisionController {
     @Operation(summary = "Удалить слот у услуги (только владелец или ADMIN)")
     @PostMapping("/remove-slot")
     public ResponseEntity<Void> removeSlot(@RequestBody @Valid RemoveProvisionSlotRequest dto) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
         provisionService.removeSlotInProvision(dto, currentUser.getId());
         return ResponseEntity.ok().build();
     }

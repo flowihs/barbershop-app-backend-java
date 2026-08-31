@@ -1,17 +1,12 @@
 package com.github.barbershop.provision.dto;
 
-import com.github.barbershop.provision.entity.ProvisionCategory;
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
-@Setter
-@Builder
-public class CreateProvisionCategoryRequest {
+public class UpdateProvisionCategoryRequest {
+
     @NotBlank
     private String name;
 

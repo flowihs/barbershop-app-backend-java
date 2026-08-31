@@ -1,6 +1,6 @@
 package com.github.barbershop.provision.entity;
 
-import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.entity.Account;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +31,7 @@ public class ProvisionLike {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Account user;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;

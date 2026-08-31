@@ -1,6 +1,6 @@
 package com.github.barbershop.provision.controller;
 
-import com.github.barbershop.account.entity.User;
+import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.security.AuthUtils;
 import com.github.barbershop.provision.dto.CreateProvisionCategoryRequest;
 import com.github.barbershop.provision.dto.ProvisionCategoryResponse;
@@ -52,7 +52,8 @@ public class ProvisionCategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<ProvisionCategoryResponse> create(@RequestBody @Valid CreateProvisionCategoryRequest dto) {
-        User currentUser = authUtils.getCurrentUser();
+        Account currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionCategoryService.create(dto, currentUser.getRole()));
     }
+
 }

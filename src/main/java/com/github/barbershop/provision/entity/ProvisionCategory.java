@@ -27,6 +27,9 @@ public class ProvisionCategory {
     @Column
     private String description;
 
+    @Column
+    private String image;
+
 //    @OneToMany(mappedBy = "provisionCategory")
 //    private List<Provision> provisions;
 
