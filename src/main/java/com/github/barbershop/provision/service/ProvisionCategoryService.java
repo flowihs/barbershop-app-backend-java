@@ -3,6 +3,7 @@ package com.github.barbershop.provision.service;
 import com.github.barbershop.account.entity.UserRole;
 import com.github.barbershop.provision.dto.CreateProvisionCategoryRequest;
 import com.github.barbershop.provision.dto.ProvisionCategoryResponse;
+import com.github.barbershop.provision.dto.UpdateProvisionCategoryRequest;
 import com.github.barbershop.provision.entity.ProvisionCategory;
 import com.github.barbershop.provision.exception.InsufficientPermissionsToCreateProvisionCategoryException;
 import com.github.barbershop.provision.exception.ProvisionCategoryNotFoundException;
@@ -43,9 +44,7 @@ public class ProvisionCategoryService {
 
     @Transactional
     public ProvisionCategoryResponse create(CreateProvisionCategoryRequest dto, UserRole roleUser) {
-        if (!Objects.equals(roleUser.toString(), "ADMIN")) {
-            throw new InsufficientPermissionsToCreateProvisionCategoryException();
-        }
+        isAdmin(roleUser);
 
         UploadResult upload = storageService.uploadImage(dto.getImage());
 
@@ -58,5 +57,34 @@ public class ProvisionCategoryService {
         ProvisionCategory createProvisionCategory = provisionCategoryRepository.save(provisionCategory);
 
         return ProvisionCategoryResponse.fromEntity(createProvisionCategory);
+    }
+
+    @Transactional
+    public ProvisionCategoryResponse update (UpdateProvisionCategoryRequest dto, UserRole roleUser) {
+        isAdmin(roleUser);
+
+        ProvisionCategory category = provisionCategoryRepository.findById(dto.getId())
+                .orElseThrow(ProvisionCategoryNotFoundException::new);
+
+        if (!dto.getImage().isEmpty()) {
+            UploadResult uploadResult = storageService.uploadImage(dto.getImage());
+            category.setImage(uploadResult.publicUrl());
+        }
+
+        if (!dto.getName().isEmpty()) {
+            category.setName(dto.getName());
+        }
+
+        if (!dto.getDescription().isEmpty()) {
+            category.setDescription(dto.getDescription());
+        }
+
+        return ProvisionCategoryResponse.fromEntity(provisionCategoryRepository.save(category));
+    }
+
+    private void isAdmin(UserRole roleUser) {
+        if (!Objects.equals(roleUser.toString(), "ADMIN")) {
+            throw new InsufficientPermissionsToCreateProvisionCategoryException();
+        }
     }
 }

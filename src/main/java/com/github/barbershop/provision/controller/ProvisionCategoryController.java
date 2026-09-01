@@ -4,6 +4,7 @@ import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.security.AuthUtils;
 import com.github.barbershop.provision.dto.CreateProvisionCategoryRequest;
 import com.github.barbershop.provision.dto.ProvisionCategoryResponse;
+import com.github.barbershop.provision.dto.UpdateProvisionCategoryRequest;
 import com.github.barbershop.provision.service.ProvisionCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -56,4 +57,9 @@ public class ProvisionCategoryController {
         return ResponseEntity.ok(provisionCategoryService.create(dto, currentUser.getRole()));
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<ProvisionCategoryResponse> update(@RequestBody @Valid UpdateProvisionCategoryRequest dto) {
+        Account currentUser = authUtils.getCurrentUser();
+        return ResponseEntity.ok(provisionCategoryService.update(dto, currentUser.getRole()));
+    }
 }
