@@ -1,9 +1,6 @@
 package com.github.barbershop.account.controller;
 
-import com.github.barbershop.account.dto.UpdateAccountSocialNetworksRequest;
-import com.github.barbershop.account.dto.UpdateDescriptionAccountRequest;
-import com.github.barbershop.account.dto.UpdatePhotoRequest;
-import com.github.barbershop.account.dto.UserDTO;
+import com.github.barbershop.account.dto.*;
 import com.github.barbershop.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,8 +30,7 @@ public class AccountController {
     }
 
     @PostMapping("/update-avatar")
-    public ResponseEntity<Void> updateAvatar(@RequestBody UpdatePhotoRequest dto) {
-        accountService.updateAvatar(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(@RequestBody UpdatePhotoRequest dto) {
+        return ResponseEntity.ok(accountService.updateAvatar(dto));
     }
 }

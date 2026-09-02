@@ -5,6 +5,8 @@ import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.entity.UserRole;
 import com.github.barbershop.account.exception.AccountNotFoundException;
 import com.github.barbershop.account.repository.AccountRepository;
+import com.github.barbershop.storage.dto.UploadResult;
+import com.github.barbershop.storage.service.StorageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class AccountService {
     private final AccountRepository accountRepository;
     private final ConcurrentHashMap<Long, Object> locks = new ConcurrentHashMap<>();
+    private final StorageService storageService;
 
     @Transactional
     public UserDTO verifyTelegram(TelegramUserData telegramUser) {
@@ -89,17 +92,16 @@ public class AccountService {
     }
 
     @Transactional
-    public void updateAvatar(UpdatePhotoRequest dto) {
+    public UpdateAccountPhotoResponse updateAvatar(UpdatePhotoRequest dto) {
         Account account = accountRepository.findById(dto.getId())
                 .orElseThrow(AccountNotFoundException::new);
-
-        try {
-            String photoUrl = uploadFile(dto.getPhoto()); // логика загрузки
-            account.setPhotoUrl(photoUrl);
-            accountRepository.save(account);
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to upload avatar");
-        }
+        UploadResult uploadResult = storageService.uploadImage(dto.getPhoto());
+        account.setPhotoUrl(uploadResult.publicUrl());
+        accountRepository.save(account);
+        return UpdateAccountPhotoResponse.builder()
+                .id(account.getId())
+                .photoUrl(account.getPhotoUrl())
+                .build();
     }
 
     private String uploadFile(MultipartFile file) throws IOException {
