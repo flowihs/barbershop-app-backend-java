@@ -5,6 +5,7 @@ import com.github.barbershop.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +31,12 @@ public class AccountController {
     }
 
     @PostMapping("/update-avatar")
-    public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(@RequestBody UpdatePhotoRequest dto) {
-        return ResponseEntity.ok(accountService.updateAvatar(dto));
+    public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(@RequestParam("photo") MultipartFile photo,
+                                                                   Authentication authentication) {
+        Long userId = Long.parseLong(authentication.getName());
+        UpdatePhotoRequest request = new UpdatePhotoRequest();
+        request.setId(userId);
+        request.setPhoto(photo);
+        return ResponseEntity.ok(accountService.updateAvatar(request));
     }
 }

@@ -35,7 +35,7 @@ public class AccountService {
         Object lock = locks.computeIfAbsent(telegramId, ignored -> new Object());
         synchronized (lock) {
             try {
-                com.github.barbershop.account.entity.Account user = accountRepository.findByTelegramId(telegramId)
+                Account user = accountRepository.findByTelegramId(telegramId)
                         .orElseGet(() -> register(telegramUser));
                 return UserDTO.fromUser(user);
             } finally {
