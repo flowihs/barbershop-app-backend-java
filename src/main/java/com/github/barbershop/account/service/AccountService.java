@@ -81,12 +81,12 @@ public class AccountService {
         accountRepository.save(account);
     }
 
-    public com.github.barbershop.account.entity.Account findById(Long id) {
+    public Account findById(Long id) {
         return accountRepository.findById(id)
                 .orElseThrow(AccountNotFoundException::new);
     }
 
-    public com.github.barbershop.account.entity.Account findByTelegramId(Long telegramId) {
+    public Account findByTelegramId(Long telegramId) {
         return accountRepository.findByTelegramId(telegramId)
                 .orElseThrow(AccountNotFoundException::new);
     }
@@ -104,16 +104,8 @@ public class AccountService {
                 .build();
     }
 
-    private String uploadFile(MultipartFile file) throws IOException {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename();
-        Path path = Paths.get("uploads/avatars/" + fileName);
-        Files.createDirectories(path.getParent());
-        Files.write(path, file.getBytes());
-        return "/uploads/avatars/" + fileName;
-    }
-
-    private com.github.barbershop.account.entity.Account register(TelegramUserData telegramUser) {
-        com.github.barbershop.account.entity.Account user = com.github.barbershop.account.entity.Account.builder()
+    private Account register(TelegramUserData telegramUser) {
+        Account account = Account.builder()
                 .telegramId(telegramUser.getId())
                 .firstName(telegramUser.getFirstName())
                 .lastName(telegramUser.getLastName())
@@ -122,6 +114,6 @@ public class AccountService {
                 .role(UserRole.CLIENT)
                 .build();
 
-        return accountRepository.save(user);
+        return accountRepository.save(account);
     }
 }
