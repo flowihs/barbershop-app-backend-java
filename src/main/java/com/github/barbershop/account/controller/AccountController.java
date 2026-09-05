@@ -26,7 +26,7 @@ public class AccountController {
     }
 
     @GetMapping("/profile/{id}")
-    public ResponseEntity<UserDTO> getProfile (@RequestParam("id") Long id) {
+    public ResponseEntity<UserDTO> getProfile(@PathVariable("id") Long id) {
         return ResponseEntity.ok(accountService.getProfile(id));
     }
 
