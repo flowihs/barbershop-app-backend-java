@@ -54,24 +54,33 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public UploadResult uploadImage(MultipartFile file) {
         try {
-            byte[] webpBytes = WebpConverter.ensureWebp(file);
+            byte[] imageBytes = file.getBytes();
+            String originalFilename = file.getOriginalFilename();
+            String extension = originalFilename != null && originalFilename.contains(".")
+                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                    : ".jpg";
 
             String uuid = UUID.randomUUID().toString();
-            String key = uuid + ".webp";
+            String key = uuid + extension;
+
+            String contentType = file.getContentType();
+            if (contentType == null) {
+                contentType = "image/jpeg";
+            }
 
             PutObjectRequest putReq = PutObjectRequest.builder()
                     .bucket(bucket)
                     .key(key)
-                    .contentType("image/webp")
+                    .contentType(contentType)
                     .build();
 
-            s3.putObject(putReq, RequestBody.fromBytes(webpBytes));
+            s3.putObject(putReq, RequestBody.fromBytes(imageBytes));
 
             String publicUrl = String.format("%s/%s/%s", publicUrlBase.replaceAll("/$", ""), bucket, key);
-
             return new UploadResult(key, publicUrl);
+
         } catch (Exception e) {
-            throw new StorageException("Ошибка при загрузке изображения в хранилище");
+            throw new StorageException("Ошибка при загрузке изображения в хранилище: " + e.getMessage());
         }
     }
 }
