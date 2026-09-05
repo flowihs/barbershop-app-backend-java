@@ -31,12 +31,7 @@ public class AccountController {
     }
 
     @PostMapping("/update-avatar")
-    public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(@RequestParam("photo") MultipartFile photo,
-                                                                   Authentication authentication) {
-        Long userId = Long.parseLong(authentication.getName());
-        UpdatePhotoRequest request = new UpdatePhotoRequest();
-        request.setId(userId);
-        request.setPhoto(photo);
-        return ResponseEntity.ok(accountService.updateAvatar(request));
+    public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(@RequestBody UpdatePhotoRequest dto) {
+        return ResponseEntity.ok(accountService.updateAvatar(dto));
     }
 }
