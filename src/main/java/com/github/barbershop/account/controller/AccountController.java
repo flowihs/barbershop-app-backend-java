@@ -4,6 +4,7 @@ import com.github.barbershop.account.dto.*;
 import com.github.barbershop.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -30,13 +31,9 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getProfile(id));
     }
 
-    @PostMapping("/update-avatar")
+    @PostMapping(value = "/update-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(
-            @RequestParam("id") Long id,
-            @RequestParam("photo") MultipartFile photo) {
-        UpdatePhotoRequest dto = new UpdatePhotoRequest();
-        dto.setId(id);
-        dto.setPhoto(photo);
+            @ModelAttribute UpdatePhotoRequest dto) {
         return ResponseEntity.ok(accountService.updateAvatar(dto));
     }
 }
