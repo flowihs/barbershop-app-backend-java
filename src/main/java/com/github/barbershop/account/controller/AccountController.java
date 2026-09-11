@@ -1,6 +1,7 @@
 package com.github.barbershop.account.controller;
 
 import com.github.barbershop.account.dto.*;
+import com.github.barbershop.account.security.RequireRole;
 import com.github.barbershop.account.service.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class AccountController {
         accountService.changeDescriptionAccount(dto);
     }
 
+    @RequireRole("Admin")
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserDTO> getProfile(@PathVariable("id") Long id) {
         return ResponseEntity.ok(accountService.getProfile(id));
