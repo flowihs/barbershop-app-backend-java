@@ -27,7 +27,7 @@ public class AccountController {
         accountService.changeDescriptionAccount(dto);
     }
 
-    @RequireRole("Admin")
+    @RequireRole("ADMIN")
     @GetMapping("/profile/{id}")
     public ResponseEntity<UserDTO> getProfile(@PathVariable("id") Long id) {
         return ResponseEntity.ok(accountService.getProfile(id));

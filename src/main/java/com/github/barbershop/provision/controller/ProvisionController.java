@@ -44,7 +44,6 @@ public class ProvisionController {
     }
 
     @Operation(summary = "Создать новую услугу (доступно ADMIN и BARBER)")
-    @RequireRole({"ADMIN", "BARBER"})
     @PostMapping("/create")
     public ResponseEntity<ProvisionResponse> create(@RequestBody @Valid CreateProvisionRequest dto) {
         Account currentUser = authUtils.getCurrentUser();
