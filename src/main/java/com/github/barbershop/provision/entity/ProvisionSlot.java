@@ -24,9 +24,9 @@ public class ProvisionSlot {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    // @ManyToOne(fetch = FetchType.LAZY)
-    // @JoinColumn(name = "provision_id", nullable = false)
-    // private Provision provision;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "provision_id", nullable = false)
+    private Provision provision;
 
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;

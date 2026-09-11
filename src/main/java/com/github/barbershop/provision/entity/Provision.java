@@ -38,10 +38,10 @@ public class Provision {
     @JoinColumn(name = "user_id", nullable = false)
     private Account user;
 
-    // @OneToMany(mappedBy = "provision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    // @ToString.Exclude
-    // @JsonIgnore
-    // private List<ProvisionSlot> slots;
+    @OneToMany(mappedBy = "provision", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
+    @JsonIgnore
+    private List<ProvisionSlot> slots;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
