@@ -2,6 +2,7 @@ package com.github.barbershop.provision.controller;
 
 import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.security.AuthUtils;
+import com.github.barbershop.account.security.RequireRole;
 import com.github.barbershop.provision.dto.CreateProvisionCategoryRequest;
 import com.github.barbershop.provision.dto.ProvisionCategoryResponse;
 import com.github.barbershop.provision.dto.UpdateProvisionCategoryRequest;
@@ -51,12 +52,14 @@ public class ProvisionCategoryController {
         return provisionCategoryService.getAll();
     }
 
+    @RequireRole("ADMIN")
     @PostMapping("/create")
     public ResponseEntity<ProvisionCategoryResponse> create(@RequestBody @Valid CreateProvisionCategoryRequest dto) {
         Account currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionCategoryService.create(dto, currentUser.getRole()));
     }
 
+    @RequireRole("ADMIN")
     @PostMapping("/update")
     public ResponseEntity<ProvisionCategoryResponse> update(@RequestBody @Valid UpdateProvisionCategoryRequest dto) {
         Account currentUser = authUtils.getCurrentUser();

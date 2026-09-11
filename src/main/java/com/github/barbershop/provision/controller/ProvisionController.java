@@ -1,10 +1,9 @@
 package com.github.barbershop.provision.controller;
 
 import com.github.barbershop.account.entity.Account;
-import com.github.barbershop.account.entity.UserRole;
 import com.github.barbershop.account.security.AuthUtils;
+import com.github.barbershop.account.security.RequireRole;
 import com.github.barbershop.provision.dto.*;
-import com.github.barbershop.provision.exception.InsufficientPermissionsToCreateProvisionException;
 import com.github.barbershop.provision.service.ProvisionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -45,14 +44,10 @@ public class ProvisionController {
     }
 
     @Operation(summary = "Создать новую услугу (доступно ADMIN и BARBER)")
+    @RequireRole({"ADMIN", "BARBER"})
     @PostMapping("/create")
     public ResponseEntity<ProvisionResponse> create(@RequestBody @Valid CreateProvisionRequest dto) {
         Account currentUser = authUtils.getCurrentUser();
-
-        if (currentUser.getRole() != UserRole.ADMIN && currentUser.getRole() != UserRole.BARBER) {
-            throw new InsufficientPermissionsToCreateProvisionException();
-        }
-
         return ResponseEntity.ok(provisionService.create(dto, currentUser.getId()));
     }
 

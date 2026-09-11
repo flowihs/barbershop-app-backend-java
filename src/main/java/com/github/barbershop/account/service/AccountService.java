@@ -36,6 +36,7 @@ public class AccountService {
         synchronized (lock) {
             try {
                 Account user = accountRepository.findByTelegramId(telegramId)
+                        .map(existing -> syncTelegramProfile(existing, telegramUser))
                         .orElseGet(() -> register(telegramUser));
                 return UserDTO.fromUser(user);
             } finally {
@@ -102,6 +103,16 @@ public class AccountService {
                 .id(account.getId())
                 .photoUrl(account.getPhotoUrl())
                 .build();
+    }
+
+    private Account syncTelegramProfile(Account account, TelegramUserData telegramUser) {
+        account.setFirstName(telegramUser.getFirstName());
+        account.setLastName(telegramUser.getLastName());
+        account.setUsername(telegramUser.getUsername());
+        if (telegramUser.getPhotoUrl() != null) {
+            account.setPhotoUrl(telegramUser.getPhotoUrl());
+        }
+        return accountRepository.save(account);
     }
 
     private Account register(TelegramUserData telegramUser) {

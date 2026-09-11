@@ -1,6 +1,7 @@
 package com.github.barbershop.account.security;
 
 import com.github.barbershop.account.entity.Account;
+import com.github.barbershop.account.exception.UnauthorizedException;
 import com.github.barbershop.account.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -17,7 +18,20 @@ public class AuthUtils {
 
     public Account getCurrentUser() {
         return getCurrentUserOptional()
-                .orElseThrow(() -> new RuntimeException("Пользователь не авторизован"));
+                .orElseThrow(UnauthorizedException::new);
+    }
+
+    public boolean hasRole(Account account, String role) {
+        return account.getRole().name().equals(role);
+    }
+
+    public boolean hasAnyRole(Account account, String... roles) {
+        for (String role : roles) {
+            if (hasRole(account, role)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public Optional<Account> getCurrentUserOptional() {
