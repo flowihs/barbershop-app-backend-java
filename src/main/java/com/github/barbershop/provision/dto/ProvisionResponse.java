@@ -34,7 +34,6 @@ public class ProvisionResponse {
                 .rating(provision.getRating())
                 .avatar(provision.getAvatar())
                 .provisionCategory(ProvisionCategoryResponse.fromEntity(provision.getProvisionCategory()))
-                .provisionSlot(provision.getSlots())
                 .user(UserDTO.fromUser(provision.getUser()))
                 .build();
     }
