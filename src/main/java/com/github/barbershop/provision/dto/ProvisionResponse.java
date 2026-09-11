@@ -23,7 +23,6 @@ public class ProvisionResponse {
     private boolean isLikedByMe;
 
     private ProvisionCategoryResponse provisionCategory;
-    private List<ProvisionSlot> provisionSlot;
     private UserDTO user;
 
 
