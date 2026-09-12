@@ -2,6 +2,7 @@ package com.github.barbershop.provision.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -12,6 +13,12 @@ public class CreateProvisionRequest {
 
     @NotBlank
     private String description;
+
+    @NotBlank 
+    private String avatar;
+
+    @NotBlank 
+    private List<MultipartFile> images;
 
     @NotBlank
     private Long categoryId;

@@ -1,10 +1,12 @@
 package com.github.barbershop.account.entity;
 
+import com.github.barbershop.provision.entity.ProvisionBooking;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -42,6 +44,9 @@ public class Account {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     private UserRole role;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY)
+    private List<ProvisionBooking> bookings;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

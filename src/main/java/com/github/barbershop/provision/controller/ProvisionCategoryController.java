@@ -53,14 +53,16 @@ public class ProvisionCategoryController {
     }
 
     @RequireRole("ADMIN")
-    @PostMapping("/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+        produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProvisionCategoryResponse> create(@RequestBody @Valid CreateProvisionCategoryRequest dto) {
         Account currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionCategoryService.create(dto, currentUser.getRole()));
     }
 
     @RequireRole("ADMIN")
-    @PostMapping("/update")
+    @PostMapping(value = "/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ProvisionCategoryResponse> update(@RequestBody @Valid UpdateProvisionCategoryRequest dto) {
         Account currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionCategoryService.update(dto, currentUser.getRole()));

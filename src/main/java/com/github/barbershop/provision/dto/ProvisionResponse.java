@@ -19,6 +19,7 @@ public class ProvisionResponse {
     private String description;
     private float rating;
     private String avatar;
+    private List<String> images;
     private long likesCount;
     private boolean isLikedByMe;
     private List<ProvisionSlotResponse>provisionSlots;
@@ -34,6 +35,7 @@ public class ProvisionResponse {
                 .description(provision.getDescription())
                 .rating(provision.getRating())
                 .avatar(provision.getAvatar())
+                .images(provision.getImages())
                 .provisionCategory(ProvisionCategoryResponse.fromEntity(provision.getProvisionCategory()))
                 .provisionSlots(provision.getSlots() != null ? provision.getSlots().stream()
                                 .map(ProvisionSlotResponse::fromEntity)

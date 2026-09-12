@@ -2,7 +2,6 @@ package com.github.barbershop.provision.controller;
 
 import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.security.AuthUtils;
-import com.github.barbershop.account.security.RequireRole;
 import com.github.barbershop.provision.dto.*;
 import com.github.barbershop.provision.service.ProvisionService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -11,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -55,6 +55,15 @@ public class ProvisionController {
     public ResponseEntity<ProvisionResponse> update(@RequestBody @Valid UpdateProvisionRequest dto) {
         Account currentUser = authUtils.getCurrentUser();
         return ResponseEntity.ok(provisionService.update(dto, currentUser.getId()));
+    }
+
+    @Operation(summary = "Обновить изображения услуги (только владелец или ADMIN)")
+    @PutMapping(value = "/{id}/images", consumes = "multipart/form-data")
+    public ResponseEntity<ProvisionResponse> updateImages(
+            @PathVariable Long id,
+            @RequestPart("images") List<MultipartFile> images) {
+        Account currentUser = authUtils.getCurrentUser();
+        return ResponseEntity.ok(provisionService.updateImages(id, images, currentUser.getId()));
     }
 
     @Operation(summary = "Удалить услугу (только владелец или ADMIN)")

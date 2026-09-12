@@ -12,6 +12,9 @@ import com.github.barbershop.provision.exception.*;
 import com.github.barbershop.provision.repository.ProvisionLikeRepository;
 import com.github.barbershop.provision.repository.ProvisionRepository;
 import com.github.barbershop.provision.repository.ProvisionSlotRepository;
+import com.github.barbershop.storage.dto.UploadResult;
+import com.github.barbershop.storage.service.StorageService;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,7 @@ public class ProvisionService {
     private final AccountService userService;
     private final ProvisionLikeRepository provisionLikeRepository;
     private final ProvisionSlotRepository provisionSlotRepository;
+    private final StorageService storageService;
 
     public List<ProvisionResponse> getAll() {
         List<Provision> provisions = provisionRepository.findAll();
@@ -75,12 +80,16 @@ public class ProvisionService {
                         .build())
                 .toList();
 
+        List<UploadResult> uploadResults = storageService.uploadImages(dto.getImages());
+
         final Provision provision = Provision.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .provisionCategory(provisionCategory)
                 .user(user)
                 .slots(slots)
+                .avatar(dto.getAvatar())
+                .images(uploadResults.stream().map(UploadResult::publicUrl).toList())
                 .build();
 
         slots.forEach(slot -> slot.setProvision(provision));
@@ -130,8 +139,36 @@ public class ProvisionService {
             existingProvision.setProvisionCategory(category);
         }
 
+        if (dto.getAvatar() != null) {
+            existingProvision.setAvatar(dto.getAvatar());
+        }
+
+        if (dto.getImages() != null) {
+            List<UploadResult> uploadResult = storageService.uploadImages(dto.getImages());
+            existingProvision.setImages(uploadResult.stream().map(UploadResult::publicUrl).toList());
+        }
+
         Provision updatedProvision = provisionRepository.save(existingProvision);
         return ProvisionResponse.fromEntity(updatedProvision);
+    }
+
+    @Transactional
+    public ProvisionResponse updateImages(final Long provisionId,
+                                          final List<MultipartFile> files,
+                                          final Long userId) {
+        Provision provision = provisionRepository.findById(provisionId)
+                .orElseThrow(ProvisionNotFoundException::new);
+
+        if (!canManage(provision, userId)) {
+            throw new InsufficientPermissionsToUpdateProvisionException();
+        }
+
+        List<String> imageUrls = storageService.uploadImages(files).stream()
+                .map(UploadResult::publicUrl)
+                .toList();
+        provision.setImages(imageUrls);
+
+        return ProvisionResponse.fromEntity(provisionRepository.save(provision));
     }
 
     @Transactional

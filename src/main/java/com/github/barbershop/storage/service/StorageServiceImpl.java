@@ -15,7 +15,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class StorageServiceImpl implements StorageService {
@@ -83,5 +85,16 @@ public class StorageServiceImpl implements StorageService {
         } catch (Exception e) {
             throw new StorageException("Ошибка при загрузке изображения в хранилище: " + e.getMessage());
         }
+    }
+
+    @Override
+    public List<UploadResult> uploadImages(List<MultipartFile> files) {
+        if (files == null || files.isEmpty()) {
+            throw new StorageException("Список изображений не может быть пустым");
+        }
+
+        return files.stream()
+                .map(this::uploadImage)
+                .collect(Collectors.toList());
     }
 }

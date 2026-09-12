@@ -31,6 +31,9 @@ public class Provision {
     @Column
     private String avatar;
 
+    @Column 
+    private List<String> images;
+
     @ManyToOne
     private ProvisionCategory provisionCategory;
 
