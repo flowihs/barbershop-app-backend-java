@@ -31,7 +31,8 @@ public class AccountController {
         return ResponseEntity.ok(accountService.getProfile(id));
     }
 
-    @PostMapping(value = "/update-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/update-avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(
             @ModelAttribute UpdatePhotoRequest dto) {
         return ResponseEntity.ok(accountService.updateAvatar(dto));
