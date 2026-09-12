@@ -45,6 +45,7 @@ public class StorageServiceImpl implements StorageService {
         AwsBasicCredentials creds = AwsBasicCredentials.create(accessKey, secretKey);
         s3 = S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
+                .forcePathStyle(true)
                 .credentialsProvider(StaticCredentialsProvider.create(creds))
                 .region(Region.of(region))
                 .httpClientBuilder(UrlConnectionHttpClient.builder())
