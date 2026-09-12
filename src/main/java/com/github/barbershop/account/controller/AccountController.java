@@ -1,6 +1,7 @@
 package com.github.barbershop.account.controller;
 
 import com.github.barbershop.account.dto.*;
+import com.github.barbershop.account.security.AuthUtils;
 import com.github.barbershop.account.security.RequireRole;
 import com.github.barbershop.account.service.AccountService;
 import jakarta.validation.Valid;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/account")
 public class AccountController {
     private final AccountService accountService;
+    private final AuthUtils authUtils;
 
     @PostMapping("/update-social-netoworks")
     public void updateSocialNetworks (@RequestBody @Valid final UpdateAccountSocialNetworksRequest dto) {
@@ -35,6 +37,6 @@ public class AccountController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdateAccountPhotoResponse> updateAvatar(
             @ModelAttribute UpdatePhotoRequest dto) {
-        return ResponseEntity.ok(accountService.updateAvatar(dto));
+        return ResponseEntity.ok(accountService.updateAvatar(dto, authUtils.getCurrentUser()));
     }
 }

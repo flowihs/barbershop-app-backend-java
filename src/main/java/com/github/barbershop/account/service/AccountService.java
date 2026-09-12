@@ -87,8 +87,8 @@ public class AccountService {
     }
 
     @Transactional
-    public UpdateAccountPhotoResponse updateAvatar(UpdatePhotoRequest dto) {
-        Account account = accountRepository.findByTelegramId(dto.getId())
+    public UpdateAccountPhotoResponse updateAvatar(UpdatePhotoRequest dto, Account currentUser) {
+        Account account = accountRepository.findById(currentUser.getId())
                 .orElseThrow(AccountNotFoundException::new);
         UploadResult uploadResult = storageService.uploadImage(dto.getPhoto());
         account.setPhotoUrl(uploadResult.publicUrl());
