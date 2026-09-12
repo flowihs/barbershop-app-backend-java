@@ -88,13 +88,13 @@ public class AccountService {
 
     @Transactional
     public UpdateAccountPhotoResponse updateAvatar(UpdatePhotoRequest dto) {
-        Account account = accountRepository.findById(dto.getId())
+        Account account = accountRepository.findByTelegramId(dto.getId())
                 .orElseThrow(AccountNotFoundException::new);
         UploadResult uploadResult = storageService.uploadImage(dto.getPhoto());
         account.setPhotoUrl(uploadResult.publicUrl());
         accountRepository.save(account);
         return UpdateAccountPhotoResponse.builder()
-                .id(account.getId())
+            .id(account.getTelegramId())
                 .photoUrl(account.getPhotoUrl())
                 .build();
     }
@@ -103,7 +103,7 @@ public class AccountService {
         account.setFirstName(telegramUser.getFirstName());
         account.setLastName(telegramUser.getLastName());
         account.setUsername(telegramUser.getUsername());
-        if (telegramUser.getPhotoUrl() != null) {
+        if (account.getPhotoUrl() == null && telegramUser.getPhotoUrl() != null) {
             account.setPhotoUrl(telegramUser.getPhotoUrl());
         }
         return accountRepository.save(account);
