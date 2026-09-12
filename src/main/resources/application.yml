@@ -94,10 +94,10 @@ telegram:
 
 supabase:
   s3:
-    endpoint: "https://qzcaycblufsrtzudlrol.supabase.co/storage/v1/s3"
+    endpoint: "https://qzcaycblufsrtzudlrol.storage.supabase.co/storage/v1/s3"
     region: "eu-west-1"
-    access-key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6Y2F5Y2JsdWZzcnR6dWRscm9sIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNjEyNjA1MywiZXhwIjoyMDUxNzAyMDUzfQ.mA_-FxRyBH70-uLVtrnbqQ_XXHospOp"
-    secret-key: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6Y2F5Y2JsdWZzcnR6dWRscm9sIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczNjEyNjA1MywiZXhwIjoyMDUxNzAyMDUzfQ.mA_-FxRyBH70-uLVtrnbqQ_XXHospOp"
+    access-key: "${SUPABASE_S3_ACCESS_KEY}"
+    secret-key: "${SUPABASE_S3_SECRET_KEY}"
     bucket: "barbershop"
     public-url-base: "https://qzcaycblufsrtzudlrol.supabase.co/storage/v1/object/public"
 
