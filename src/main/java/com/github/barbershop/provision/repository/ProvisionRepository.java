@@ -18,8 +18,10 @@ public interface ProvisionRepository extends JpaRepository<Provision, Long> {
 
     Optional<Provision> findByIdAndUserId(Long id, Long userId);
 
+    @EntityGraph(attributePaths = {"slots", "provisionCategory", "user"})
     @Query("SELECT p.user.id FROM Provision p WHERE p.id = :provisionId")
     Long findUserIdById(@Param("provisionId") Long provisionId);
 
+    @EntityGraph(attributePaths = {"slots", "provisionCategory", "user"})
     List<Provision> findTop5ByUserIdOrderByRatingDesc(Long userId);
 }
