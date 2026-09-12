@@ -33,7 +33,7 @@ public class ProvisionController {
 
     @Operation(summary = "Получить топ 5 услуг пользователя по рейтингу")
     @GetMapping("/top-five/{id}")
-    public ResponseEntity<List<ProvisionResponse>> getTop5ByUserIdOrderByRatingDesc (@PathVariable Long userId) {
+    public ResponseEntity<List<ProvisionResponse>> getTop5ByUserIdOrderByRatingDesc (@PathVariable("id") Long userId) {
         return ResponseEntity.ok(provisionService.getTop5ByUserIdOrderByRatingDesc(userId));
     }
 
