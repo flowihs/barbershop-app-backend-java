@@ -100,8 +100,8 @@ supabase:
   s3:
     endpoint: "https://qzcaycblufsrtzudlrol.storage.supabase.co/storage/v1/s3"
     region: "eu-west-1"
-    access-key: "${SUPABASE_S3_ACCESS_KEY}"
-    secret-key: "${SUPABASE_S3_SECRET_KEY}"
+    access-key: "3b558d1b54107d77be8fd4296edd0878"
+    secret-key: "e9ec5ad5e20805ab4247fb78e3d78e2d1de3020a03d7a7a2d4232b75e365de05"
     bucket: "barbershop"
     # publicUrlBase — шаблон для публичного доступа к объектам (настрой под ваш проект)
     # Например: https://<project-ref>.supabase.co/storage/v1/object/public
