@@ -2,13 +2,13 @@ package com.github.barbershop.provision.dto;
 
 import com.github.barbershop.account.dto.UserDTO;
 import com.github.barbershop.provision.entity.Provision;
-import com.github.barbershop.provision.entity.ProvisionSlot;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Array;
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Getter
 @Setter
@@ -21,6 +21,7 @@ public class ProvisionResponse {
     private String avatar;
     private long likesCount;
     private boolean isLikedByMe;
+    private List<ProvisionSlotResponse>provisionSlots;
 
     private ProvisionCategoryResponse provisionCategory;
     private UserDTO user;
@@ -34,6 +35,9 @@ public class ProvisionResponse {
                 .rating(provision.getRating())
                 .avatar(provision.getAvatar())
                 .provisionCategory(ProvisionCategoryResponse.fromEntity(provision.getProvisionCategory()))
+                .provisionSlots(provision.getSlots() != null ? provision.getSlots().stream()
+                                .map(ProvisionSlotResponse::fromEntity)
+                                .collect(Collectors.toList()) : null)
                 .user(UserDTO.fromUser(provision.getUser()))
                 .build();
     }
