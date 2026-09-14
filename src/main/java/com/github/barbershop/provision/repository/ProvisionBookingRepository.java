@@ -4,8 +4,10 @@ import com.github.barbershop.provision.entity.ProvisionBooking;
 import com.github.barbershop.provision.entity.ProvisionSlot;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProvisionBookingRepository extends JpaRepository<ProvisionBooking, Long> {
     Optional<ProvisionBooking> findByProvisionSlot(ProvisionSlot provisionSlot);
+    List<ProvisionBooking> findByBarberId(Long barberId);
 }

@@ -19,6 +19,8 @@ public class ProvisionBooking {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private Long barberId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private Account account;

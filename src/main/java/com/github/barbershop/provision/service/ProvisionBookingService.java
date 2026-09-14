@@ -3,8 +3,12 @@ package com.github.barbershop.provision.service;
 import com.github.barbershop.account.entity.Account;
 import com.github.barbershop.account.service.AccountService;
 import com.github.barbershop.provision.dto.BookingSlotRequest;
+import com.github.barbershop.provision.dto.ProvisionBookingForBarberResponse;
+import com.github.barbershop.provision.dto.ProvisionBookingResponse;
 import com.github.barbershop.provision.entity.ProvisionBooking;
 import com.github.barbershop.provision.entity.ProvisionSlot;
+import com.github.barbershop.provision.exception.InsufficientPermissionsToCancelBookingException;
+import com.github.barbershop.provision.exception.ProvisionBookingNotFoundException;
 import com.github.barbershop.provision.exception.ProvisionSlotNotAvailableException;
 import com.github.barbershop.provision.exception.ProvisionSlotNotFoundException;
 import com.github.barbershop.provision.repository.ProvisionBookingRepository;
@@ -13,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +43,34 @@ public class ProvisionBookingService {
         } else {
             createBooking(account, slot);
         }
+    }
+
+    @Transactional
+    public void cancelBookingForBarber(final Long bookingId, final Long userId) {
+        ProvisionBooking provisionBooking = provisionBookingRepository.findById(bookingId)
+                .orElseThrow(ProvisionBookingNotFoundException::new);
+        ProvisionSlot slot = provisionSlotRepository.findById(provisionBooking.getProvisionSlot().getId())
+                .orElseThrow(ProvisionSlotNotFoundException::new);
+
+        if (!slot.getProvision().getUser().getId().equals(userId)) {
+            throw new InsufficientPermissionsToCancelBookingException();
+        }
+
+        slot.setAvailable(true);
+
+        provisionBookingRepository.delete(provisionBooking);
+    }
+
+    public List<ProvisionBookingResponse> getBookingForClient(final Long userId) {
+        Account account = accountService.findById(userId);
+        return account.getBookings().stream().map(ProvisionBookingResponse::fromEntity)
+                .toList();
+    }
+
+    public List<ProvisionBookingForBarberResponse> getBookingForBarber(final Long userId) {
+        Account account = accountService.findById(userId);
+        return provisionBookingRepository.findByBarberId(userId).stream()
+                .map(ProvisionBookingForBarberResponse::fromEntity).toList();
     }
 
     private void createBooking(final Account account, final ProvisionSlot slot) {
