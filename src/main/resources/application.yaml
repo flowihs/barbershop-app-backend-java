@@ -90,7 +90,7 @@ management:
 
 telegram:
   bot:
-    token: "8696905823:AAHtTk1Kz8VbrgK5wIjsojpSkIzBvS19rE0"
+    token: "8689939913:AAEdHp3p2tLexQ5XrfTN9A3TeP45O4Zqyqg"
 
 supabase:
   url: https://qzcaycblufsrtzudlrol.supabase.co
