@@ -23,5 +23,5 @@ public class CreateProvisionRequest {
     @NotBlank
     private Long categoryId;
 
-    List<CreateProvisionSlotRequest> slots;
+    List<CreateProvisionSlotForProvisionRequest> slots;
 }

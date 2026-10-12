@@ -90,7 +90,7 @@ management:
 
 telegram:
   bot:
-    token: "8689939913:AAEdHp3p2tLexQ5XrfTN9A3TeP45O4Zqyqg"
+    token: "8689939913:AAEdHp3p2tLexQ5XrfTN9A3TeP45O4Zqyq"
 
 supabase:
   s3:

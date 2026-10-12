@@ -1,7 +1,5 @@
--- Create enum type for user roles
 CREATE TYPE user_role AS ENUM ('CLIENT', 'BARBER', 'ADMIN');
 
--- Create users table
 CREATE TABLE IF NOT EXISTS users (
     id          SERIAL PRIMARY KEY,
     telegram_id BIGINT UNIQUE,
@@ -14,6 +12,5 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create indexes for frequently queried columns
 CREATE INDEX IF NOT EXISTS idx_users_telegram_id ON users(telegram_id);
 CREATE INDEX IF NOT EXISTS idx_users_username ON users(username);
