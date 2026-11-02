@@ -1,7 +1,10 @@
 package com.github.barbershop.storage.exception;
 
-public class InvalidImageFormatException extends RuntimeException {
+import com.github.barbershop.common.error.exception.StorageException;
+import org.springframework.http.HttpStatus;
+
+public class InvalidImageFormatException extends StorageException {
     public InvalidImageFormatException() {
-        super("Файл не является изображением или поврежден");
+        super("Файл не является изображением или поврежден", HttpStatus.BAD_REQUEST);
     }
 }

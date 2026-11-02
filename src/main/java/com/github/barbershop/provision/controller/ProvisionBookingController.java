@@ -41,15 +41,18 @@ public class ProvisionBookingController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Получить брони конкретного пользователя")
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ProvisionBookingResponse>> getBookingsForClient(@PathVariable Long id) {
-        return ResponseEntity.ok(provisionBookingService.getBookingForClient(id));
+    @Operation(summary = "Получить брони конкретного клиента")
+    @GetMapping("/client/{userId}")
+    public ResponseEntity<List<ProvisionBookingResponse>> getBookingsForClient(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(provisionBookingService.getBookingForClient(userId));
     }
 
     @Operation(summary = "Получение брони для барбера")
-    @GetMapping("/{userId}")
-    public ResponseEntity<List<ProvisionBookingForBarberResponse>> getBookingForBarber(@PathVariable Long id) {
-        return ResponseEntity.ok(provisionBookingService.getBookingForBarber(id));
+    @GetMapping("/barber/{userId}")
+    @RequireRole("BARBER")
+    public ResponseEntity<List<ProvisionBookingForBarberResponse>> getBookingForBarber(
+            @PathVariable Long userId) {
+        return ResponseEntity.ok(provisionBookingService.getBookingForBarber(userId));
     }
 }

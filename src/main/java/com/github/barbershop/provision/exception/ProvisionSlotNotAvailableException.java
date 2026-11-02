@@ -1,7 +1,10 @@
 package com.github.barbershop.provision.exception;
 
-public class ProvisionSlotNotAvailableException extends RuntimeException {
+import com.github.barbershop.common.error.exception.ProvisionException;
+import org.springframework.http.HttpStatus;
+
+public class ProvisionSlotNotAvailableException extends ProvisionException {
     public ProvisionSlotNotAvailableException() {
-        super("Слот уже заброванирован");
+        super("Слот уже заброванирован", HttpStatus.BAD_REQUEST);
     }
 }

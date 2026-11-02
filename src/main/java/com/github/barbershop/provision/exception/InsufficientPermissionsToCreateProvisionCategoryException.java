@@ -1,7 +1,10 @@
 package com.github.barbershop.provision.exception;
 
-public class InsufficientPermissionsToCreateProvisionCategoryException extends RuntimeException {
+import com.github.barbershop.common.error.exception.ProvisionException;
+import org.springframework.http.HttpStatus;
+
+public class InsufficientPermissionsToCreateProvisionCategoryException extends ProvisionException {
     public InsufficientPermissionsToCreateProvisionCategoryException() {
-        super("Недостаточно прав для создания категории");
+        super("Недостаточно прав для создания категории", HttpStatus.BAD_REQUEST);
     }
 }
