@@ -4,6 +4,7 @@ import com.github.barbershop.storage.dto.UploadResult;
 import com.github.barbershop.common.error.exception.StorageException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
@@ -83,14 +84,14 @@ public class StorageServiceImpl implements StorageService {
             return new UploadResult(key, publicUrl);
 
         } catch (Exception e) {
-            throw new StorageException("Ошибка при загрузке изображения в хранилище: " + e.getMessage());
+            throw new StorageException("Ошибка при загрузке изображения в хранилище", HttpStatus.BAD_REQUEST);
         }
     }
 
     @Override
     public List<UploadResult> uploadImages(List<MultipartFile> files) {
         if (files == null || files.isEmpty()) {
-            throw new StorageException("Список изображений не может быть пустым");
+            throw new StorageException("Список изображений не может быть пустым", HttpStatus.BAD_REQUEST);
         }
 
         return files.stream()

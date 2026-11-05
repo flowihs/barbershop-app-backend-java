@@ -9,6 +9,7 @@ import java.util.Iterator;
 
 import com.github.barbershop.storage.exception.InvalidImageFormatException;
 import com.github.barbershop.common.error.exception.StorageException;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 
 public class WebpConverter {
@@ -85,7 +86,7 @@ public class WebpConverter {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             boolean ok = ImageIO.write(img, "webp", baos);
             if (!ok) {
-                throw new StorageException("Модуль записи WebP недоступен");
+                throw new StorageException("Модуль записи WebP недоступен", HttpStatus.CONFLICT);
             }
             return baos.toByteArray();
         } catch (IOException e) {
