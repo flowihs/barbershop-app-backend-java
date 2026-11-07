@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -75,5 +76,11 @@ public class GlobalExceptionHandler {
                         "error", e.getMessage(),
                         "timestamp", LocalDateTime.now()
                 ));
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatus(ResponseStatusException exception) {
+        return ResponseEntity.status(exception.getStatusCode())
+                .body(Map.of("message", exception.getReason() == null ? "Ошибка запроса" : exception.getReason()));
     }
 }
